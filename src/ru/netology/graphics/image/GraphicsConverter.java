@@ -26,6 +26,10 @@ public class GraphicsConverter implements TextGraphicsConverter {
     private double maxRatio;
     private TextColorSchema schema;
 
+    public GraphicsConverter() {
+        this.schema = new ColorSchema();
+    }
+
     /**
      * @param url урл изображения
      * @return String картинки
