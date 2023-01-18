@@ -59,23 +59,34 @@ public class GraphicsConverter implements TextGraphicsConverter {
 
         int width = img.getWidth();
         int height = img.getHeight();
-        double ratio = (double) width / height;
 
-        if (ratio > maxRatio) {
-            throw new BadImageSizeException(ratio, maxRatio);
-        }
+        if (width > height || width < height) {
+            double ratio = width > height ? ((double) width / height) : ((double) height / width);
 
-        double widthCompr = (double) width / maxWidth;
-        double heightCompr = (double) height / maxHeight;
+            if (ratio > maxRatio) {
+                throw new BadImageSizeException(ratio, maxRatio);
+            }
 
-        if (width > maxWidth) {
-            width = (int) (width / widthCompr);
-            height = (int) (height / widthCompr);
-        }
+            if (width > maxWidth && width > height) {
+                double widthCompr = (double) width / maxWidth;
+                width = maxWidth;
+                height = (int) (height / widthCompr);
 
-        if (height > maxHeight) {
-            width = (int) (width / heightCompr);
-            height = (int) (height / heightCompr);
+            } else if (height > maxHeight && width < height) {
+                double heightCompr = (double) height / maxHeight;
+                height = maxHeight;
+                width = (int) (width / heightCompr);
+
+            }
+
+        } else {
+            // width == height
+            if (width > maxWidth) {
+                double widthCompr = (double) width / maxWidth;
+                width = maxWidth;
+                height = (int) (height / widthCompr);
+
+            }
         }
 
         int newWidth = width;
