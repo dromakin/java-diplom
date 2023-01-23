@@ -60,37 +60,18 @@ public class GraphicsConverter implements TextGraphicsConverter {
         int width = img.getWidth();
         int height = img.getHeight();
 
-        if (width > height || width < height) {
-            double ratio = width > height ? ((double) width / height) : ((double) height / width);
+        double ratio = width > height ? ((double) width / height) : ((double) height / width);
 
-            if (ratio > maxRatio) {
-                throw new BadImageSizeException(ratio, maxRatio);
-            }
-
-            if (width > maxWidth && width > height) {
-                double widthCompr = (double) width / maxWidth;
-                width = maxWidth;
-                height = (int) (height / widthCompr);
-
-            } else if (height > maxHeight && width < height) {
-                double heightCompr = (double) height / maxHeight;
-                height = maxHeight;
-                width = (int) (width / heightCompr);
-
-            }
-
-        } else {
-            // width == height
-            if (width > maxWidth) {
-                double widthCompr = (double) width / maxWidth;
-                width = maxWidth;
-                height = (int) (height / widthCompr);
-
-            }
+        if (maxRatio > 0 && ratio > maxRatio) {
+            throw new BadImageSizeException(ratio, maxRatio);
         }
 
-        int newWidth = width;
-        int newHeight = height;
+        boolean isImageLargerMax = (maxWidth > 0 && maxWidth < width) || (maxHeight > 0 && maxHeight < height);
+        int max = Math.max(width / maxWidth, height / maxHeight);
+
+        int newWidth = isImageLargerMax ? (width / max) : width;
+        int newHeight = isImageLargerMax ? (height / max) : height;
+
         // double newRatio = (double) newWidth / newHeight;
 
         // Теперь нам надо попросить картинку изменить свои размеры на новые.
@@ -140,11 +121,11 @@ public class GraphicsConverter implements TextGraphicsConverter {
         // в символ будет заниматься другой объект, который мы рассмотрим ниже
         StringBuilder result = new StringBuilder();
 
-        for (int h = 0; h < height; h++) {
-            for (int w = 0; w < width; w++) {
+        for (int h = 0; h < newHeight; h++) {
+            for (int w = 0; w < newWidth; w++) {
                 int color = bwRaster.getPixel(w, h, new int[3])[0];
-                char c = schema.convert(color);
-                result.append(c).append(" ");
+                char c= schema.convert(color);
+                result.append(c).append(c);
             }
             result.append("\n");
         }
